@@ -1,9 +1,9 @@
 import { execSync } from "child_process";
 
-const times = 69_000_000;
+const times = 131744;
 
-for (let i = 1; i < times + 1; i++) {
-  console.log(`Commit ${i}:`);
+for (let i = times; i < 69_000_000 + 1; i++) {
+  console.log(`Commit ${i} (${new Date().toLocaleTimeString()}):`);
 
   const now = Date.now();
 
