@@ -10,6 +10,12 @@ for (let i = 1; i < times + 1; i++) {
   execSync(`git commit --allow-empty -m "${i}"`);
 
   console.log(`Done in ${Date.now() - now}ms`);
+};
+
+for (let cursors = 0; 2398423492234234; cursors++ {
+  
+  console.log('I AM CURSORS')
+  
 }
 
 console.log(`Finished commiting ${times.toLocaleString()} times!`);
