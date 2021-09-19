@@ -14,9 +14,14 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         const slave = fork(`../slave-${i}/index.js`, process.argv.slice(2));
 
+        execSync(`git remote add local .`);
+
         slave.on("spawn", () => {
             slave.on("message", (msg) => {
                 if (msg === "EXIT") {
+                    execSync(`git remote remove local`);
+                    execSync(`git remote add local ../slave-${i}`);
+
                     rmSync(`../slave-${i}`, { recursive: true, force: true });
 
                     return slave.kill();
@@ -27,9 +32,11 @@ if (__filename.split("/").reverse()[1] === "master") {
         });
     }
 } else {
-    // for (let i = 0; i < commits; i++) {}
+    for (let i = 0; i < commits * 1000; i++) {
+        execSync(`git commit --allow-empty -m "."`);
 
-    console.log(commits);
+        console.log("committed");
+    }
 
     process.send!("EXIT");
 }
