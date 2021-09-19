@@ -13,13 +13,9 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         execSync(`tsc ../slave-${i}/index.ts`);
 
-        const slave = fork(`../slave-${i}/index.js`);
+        const slave = fork(`../slave-${i}/index.js`, {});
 
         slave.on("spawn", () => {
-            slave.stdout!.on("data", (data) => {
-                console.log(data.toString());
-            });
-
             slave.on("message", (msg) => {
                 console.log(msg.toString());
 
