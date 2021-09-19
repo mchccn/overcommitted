@@ -37,7 +37,7 @@ if (__filename.split("/").reverse()[1] === "master") {
     }
 } else {
     for (let i = 0; i < commits; i++) {
-        execSync(`git commit --allow-empty -m "."`);
+        execSync(`git commit --allow-empty -m "slave"`);
 
         process.send!(`commit ${i}`);
     }
