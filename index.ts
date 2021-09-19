@@ -21,6 +21,8 @@ if (__filename.split("/").reverse()[1] === "master") {
                 if (msg === "EXIT") {
                     execSync(`git remote remove local`);
                     execSync(`git remote add local ../slave-${i}`);
+                    execSync(`git fetch local`);
+                    execSync(`git merge local/master`);
 
                     rmSync(`../slave-${i}`, { recursive: true, force: true });
 
@@ -35,7 +37,7 @@ if (__filename.split("/").reverse()[1] === "master") {
     for (let i = 0; i < commits; i++) {
         execSync(`git commit --allow-empty -m "."`);
 
-        process.send!("committed");
+        process.send!(`commit ${i}`);
     }
 
     process.send!("EXIT");
