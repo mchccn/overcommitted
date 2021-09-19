@@ -1,6 +1,8 @@
 import { execSync, fork } from "child_process";
 import { rmSync } from "fs";
 
+console.log(__filename);
+
 if (__filename.split("/").reverse()[1] === "master") {
     const threads = Number(process.argv[2]) || 10;
 
@@ -13,11 +15,17 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         const slave = fork(`../slave-${i}/index.js`);
 
-        slave.on("message", (msg) => {
-            console.log(msg.toString());
-        });
+        slave.on("spawn", () => {
+            slave.stdout!.on("data", (data) => {
+                console.log(data.toString());
+            });
 
-        slave.kill();
+            slave.on("message", (msg) => {
+                console.log(msg.toString());
+
+                slave.kill();
+            });
+        });
     }
 
     // ! TEMP
