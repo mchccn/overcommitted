@@ -32,10 +32,10 @@ if (__filename.split("/").reverse()[1] === "master") {
         });
     }
 } else {
-    for (let i = 0; i < commits * 1000; i++) {
+    for (let i = 0; i < commits; i++) {
         execSync(`git commit --allow-empty -m "."`);
 
-        console.log("committed");
+        process.send!("committed");
     }
 
     process.send!("EXIT");
