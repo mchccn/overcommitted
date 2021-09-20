@@ -3,7 +3,7 @@ import { rmSync } from "fs";
 import { join } from "path";
 
 const threads = Number(process.argv[2]) || 10;
-const commits = Number(process.argv[3]) || 100;
+const commits = Number(process.argv[3]) || 10;
 
 if (__filename.split("/").reverse()[1] === "master") {
     console.log(`Spawning ${threads} slaves...`);
@@ -41,7 +41,7 @@ if (__filename.split("/").reverse()[1] === "master") {
 
     execSync(`git checkout -b slave-${id}`);
 
-    for (let i = 1; i < commits * 100; i++) {
+    for (let i = 1; i < commits * 1000; i++) {
         execSync(`git commit --allow-empty -m "[slave-${id}]: ${i}"`);
 
         process.send!(`commit ${i}`);
