@@ -15,21 +15,19 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()], { cwd: join(process.cwd(), "..", `slave-${i}`) });
 
-        slave.on("spawn", () => {
-            slave.on("message", (msg) => {
-                if (msg === "EXIT") {
-                    execSync(`git remote remove local`);
-                    execSync(`git remote add local ../slave-${i}`);
-                    execSync(`git fetch local`);
-                    execSync(`git merge local/slave-${i}`);
+        slave.on("message", (msg) => {
+            if (msg === "EXIT") {
+                execSync(`git remote remove local`);
+                execSync(`git remote add local ../slave-${i}`);
+                execSync(`git fetch local`);
+                execSync(`git merge local/slave-${i}`);
 
-                    rmSync(`../slave-${i}`, { recursive: true, force: true });
+                rmSync(`../slave-${i}`, { recursive: true, force: true });
 
-                    return slave.kill();
-                }
+                return slave.kill();
+            }
 
-                return console.log(`[slave-${i}]: ${msg.toString()}`);
-            });
+            return console.log(`[slave-${i}]: ${msg.toString()}`);
         });
     }
 } else {
