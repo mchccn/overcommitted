@@ -15,10 +15,6 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()], { cwd: join(process.cwd(), "..", `slave-${i}`) });
 
-        try {
-            execSync(`git remote add local .`);
-        } catch {}
-
         slave.on("spawn", () => {
             slave.on("message", (msg) => {
                 if (msg === "EXIT") {
