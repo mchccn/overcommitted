@@ -38,9 +38,9 @@ for (let i = 0; i < threads; i++) {
 }
 ```
 
-We also pass the identifier to the slave using `fork`'s `argv` parameter, and we also set the cwd of the slave to its repository's root.
+We also pass the identifier to the slave using `fork`'s `argv` parameter, and we also set the `cwd` of the slave to its repository's root.
 
-Each slave will make its own branch to commit on, and when it's done, it will notify the master process.
+Each slave will make its _own_ branch to commit on, and when it's done, it will notify the master process.
 The master will then merge the slave's commits onto the master branch, and then proceeds to delete the slave's Git repository and kill its process.
 
 ```ts
@@ -79,5 +79,43 @@ slave.on("message", (msg) => {
 Finally, we can add a little more flair if we wish:
 
 ```ts
+// A check so that we are in the correct directory...
 
+if (join(process.cwd(), "index.ts") !== __filename) {
+    console.log(`You must be inside the master repository.`);
+
+    process.exit();
+}
 ```
+
+```ts
+// When the master is interrupted it will clean up its mess...
+
+process.on("SIGINT", () => {
+    console.log(`Cleaning up... please wait.`);
+
+    for (let i = 0; i < created; i++) {
+        try {
+            execSync(`git remote remove local`);
+            execSync(`git remote add local ../slave-${i}`);
+            execSync(`git fetch local`);
+            execSync(`git merge local/slave-${i}`);
+        } catch {
+            console.log(`Unable to merge 'slave-${i}'`);
+        }
+    }
+
+    execSync(`rm -rf ../slave-*`);
+
+    process.exit();
+});
+```
+
+Final notes:
+
+-   [GitHub repository](https://github.com/cursorsdottsx/committed)
+-   Leave a star if you liked, leave an issue if you disliked.
+-   I'm committing a lot, and then pushing all those commits, so I'm not spamming GitHub's servers.
+-   The `.git` directory will become very large, but nowhere close to GitHub's previously known limit: 100GB
+-   Write an implementation in other languages and make sure to share it with me!
+-   As of September 20, 2021, the repository has over 1.821 million commits. The image shown will be extremely behind by the time you read this.
