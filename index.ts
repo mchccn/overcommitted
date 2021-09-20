@@ -5,13 +5,13 @@ import { join } from "path";
 const threads = Number(process.argv[2]) || 10;
 const commits = Number(process.argv[3]) || 10;
 
-if (join(process.cwd(), "index.ts") !== __filename) {
-    console.log(`You must be inside the master repository.`);
-
-    process.exit();
-}
-
 if (__filename.split("/").reverse()[1] === "master") {
+    if (join(process.cwd(), "index.ts") !== __filename) {
+        console.log(`You must be inside the master repository.`);
+
+        process.exit();
+    }
+
     console.log(`Spawning ${threads} slave${threads !== 1 ? "s" : ""}...`);
 
     process.on("SIGINT", () => {
