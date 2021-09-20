@@ -6,69 +6,75 @@ const threads = Number(process.argv[2]) || 10;
 const commits = Number(process.argv[3]) || 10;
 
 if (__filename.split("/").reverse()[1] === "master") {
-    if (join(process.cwd(), "index.ts") !== __filename) {
-        console.log(`You must be inside the master repository.`);
+  if (join(process.cwd(), "index.ts") !== __filename) {
+    console.log(`You must be inside the master repository.`);
 
-        process.exit();
+    process.exit();
+  }
+
+  console.log(`Spawning ${threads} slave${threads !== 1 ? "s" : ""}...`);
+
+  process.on("SIGINT", () => {
+    console.log(`Cleaning up... please wait.`);
+
+    for (let i = 0; i < created; i++) {
+      try {
+        execSync(`git remote remove local`);
+        execSync(`git remote add local ../slave-${i}`);
+        execSync(`git fetch local`);
+        execSync(`git merge local/slave-${i}`);
+      } catch {
+        console.log(`Unable to merge 'slave-${i}'`);
+      }
     }
 
-    console.log(`Spawning ${threads} slave${threads !== 1 ? "s" : ""}...`);
+    execSync(`rm -rf ../slave-*`);
 
-    process.on("SIGINT", () => {
-        console.log(`Cleaning up... please wait.`);
+    process.exit();
+  });
 
-        for (let i = 0; i < created; i++) {
-            try {
-                execSync(`git remote remove local`);
-                execSync(`git remote add local ../slave-${i}`);
-                execSync(`git fetch local`);
-                execSync(`git merge local/slave-${i}`);
-            } catch {
-                console.log(`Unable to merge 'slave-${i}'`);
-            }
-        }
+  let created = 0;
 
-        execSync(`rm -rf ../slave-*`);
+  for (let i = 0; i < threads; i++) {
+    execSync(`git clone ../master ../slave-${i}`);
 
-        process.exit();
+    execSync(`tsc ../slave-${i}/index.ts`);
+
+    const slave = fork(
+      `../slave-${i}/index.js`,
+      [...process.argv.slice(2), i.toString()],
+      { cwd: join(process.cwd(), "..", `slave-${i}`) }
+    );
+
+    created++;
+
+    slave.on("message", (msg) => {
+      if (msg === "EXIT") {
+        execSync(`git remote remove local`);
+        execSync(`git remote add local ../slave-${i}`);
+        execSync(`git fetch local`);
+        execSync(`git merge local/slave-${i}`);
+
+        rmSync(`../slave-${i}`, { recursive: true, force: true });
+
+        return slave.kill();
+      }
+
+      return console.log(`[slave-${i}]: ${msg.toString()}`);
     });
-
-    let created = 0;
-
-    for (let i = 0; i < threads; i++) {
-        execSync(`git clone ../master ../slave-${i}`);
-
-        execSync(`tsc ../slave-${i}/index.ts`);
-
-        const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()], { cwd: join(process.cwd(), "..", `slave-${i}`) });
-
-        created++;
-
-        slave.on("message", (msg) => {
-            if (msg === "EXIT") {
-                execSync(`git remote remove local`);
-                execSync(`git remote add local ../slave-${i}`);
-                execSync(`git fetch local`);
-                execSync(`git merge local/slave-${i}`);
-
-                rmSync(`../slave-${i}`, { recursive: true, force: true });
-
-                return slave.kill();
-            }
-
-            return console.log(`[slave-${i}]: ${msg.toString()}`);
-        });
-    }
+  }
 } else {
-    const id = process.argv[4];
+  console.log(process.argv);
 
-    execSync(`git checkout -b slave-${id}`);
+  const id = process.argv[4];
 
-    for (let i = 1; i < commits * 1000; i++) {
-        execSync(`git commit --allow-empty -m "[slave-${id}]: ${i}"`);
+  execSync(`git checkout -b slave-${id}`);
 
-        process.send!(`commit ${i}`);
-    }
+  for (let i = 1; i < commits * 1000; i++) {
+    execSync(`git commit --allow-empty -m "[slave-${id}]: ${i}"`);
 
-    process.send!("EXIT");
+    process.send!(`commit ${i}`);
+  }
+
+  process.send!("EXIT");
 }
