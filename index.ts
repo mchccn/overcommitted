@@ -42,7 +42,7 @@ if (__filename.split("/").reverse()[1] === "master") {
 
     const slave = fork(
       `../slave-${i}/index.js`,
-      [threads, commits, i.toString()],
+      [threads, commits, i].map((v) => v.toString()),
       { cwd: join(process.cwd(), "..", `slave-${i}`) }
     );
 
