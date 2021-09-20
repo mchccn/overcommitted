@@ -42,7 +42,7 @@ if (__filename.split("/").reverse()[1] === "master") {
 
     const slave = fork(
       `../slave-${i}/index.js`,
-      [...process.argv.slice(2), i.toString()],
+      [threads, commits, i.toString()],
       { cwd: join(process.cwd(), "..", `slave-${i}`) }
     );
 
@@ -64,8 +64,6 @@ if (__filename.split("/").reverse()[1] === "master") {
     });
   }
 } else {
-  console.log(process.argv);
-
   const id = process.argv[4];
 
   execSync(`git checkout -b slave-${id}`);
