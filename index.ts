@@ -64,6 +64,8 @@ if (__filename.split("/").reverse()[1] === "master") {
     });
   }
 } else {
+  console.log(process.argv);
+
   const id = process.argv[4];
 
   execSync(`git checkout -b slave-${id}`);
