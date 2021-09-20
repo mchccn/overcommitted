@@ -12,7 +12,7 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         execSync(`tsc ../slave-${i}/index.ts`);
 
-        const slave = fork(`../slave-${i}/index.js`, process.argv.slice(2));
+        const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()]);
 
         try {
             execSync(`git remote add local .`);
@@ -24,7 +24,7 @@ if (__filename.split("/").reverse()[1] === "master") {
                     execSync(`git remote remove local`);
                     execSync(`git remote add local ../slave-${i}`);
                     execSync(`git fetch local`);
-                    execSync(`git merge local/master`);
+                    execSync(`git merge local/slave-${i}`);
 
                     rmSync(`../slave-${i}`, { recursive: true, force: true });
 
@@ -36,6 +36,10 @@ if (__filename.split("/").reverse()[1] === "master") {
         });
     }
 } else {
+    const id = process.env.argv[4];
+
+    execSync(`git checkout -b slave-${id}`);
+
     for (let i = 1; i < commits * 1000; i++) {
         execSync(`git commit --allow-empty -m "."`);
 
