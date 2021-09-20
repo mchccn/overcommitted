@@ -6,7 +6,7 @@ const threads = Number(process.argv[2]) || 10;
 const commits = Number(process.argv[3]) || 10;
 
 if (__filename.split("/").reverse()[1] === "master") {
-    console.log(`Spawning ${threads} slaves...`);
+    console.log(`Spawning ${threads} slave${threads !== 1 ? "s" : ""}...`);
 
     for (let i = 0; i < threads; i++) {
         execSync(`git clone ../master ../slave-${i}`);
