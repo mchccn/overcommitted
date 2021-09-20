@@ -1,5 +1,6 @@
 import { execSync, fork } from "child_process";
 import { rmSync } from "fs";
+import { join } from "path";
 
 const threads = Number(process.argv[2]) || 10;
 const commits = Number(process.argv[3]) || 10;
@@ -12,7 +13,7 @@ if (__filename.split("/").reverse()[1] === "master") {
 
         execSync(`tsc ../slave-${i}/index.ts`);
 
-        const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()]);
+        const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()], { cwd: join(process.cwd(), "..", `slave-${i}`) });
 
         try {
             execSync(`git remote add local .`);
