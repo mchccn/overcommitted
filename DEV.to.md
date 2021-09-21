@@ -32,7 +32,7 @@ for (let i = 0; i < threads; i++) {
 
     execSync(`tsc ../slave-${i}/index.ts`);
 
-    const slave = fork(`../slave-${i}/index.js`, [...process.argv.slice(2), i.toString()], { cwd: join(process.cwd(), "..", `slave-${i}`) });
+    const slave = fork(`../slave-${i}/index.js`, [threads, commits, i.toString()].map((v) => v.toString()), { cwd: join(process.cwd(), "..", `slave-${i}`) });
 
     // ...
 }
