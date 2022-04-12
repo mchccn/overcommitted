@@ -1,7 +1,5 @@
 id=$1
-commits=$(($2 + 0))
-
-echo $commits > LOG
+commits=$(($2 * 1000))
 
 for i in $(seq 1 $commits)
 do

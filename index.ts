@@ -2,7 +2,7 @@ import { execSync, fork } from "child_process";
 import { join } from "path";
 
 const threads = Number(process.argv[2]) || 10;
-const commits = (Number(process.argv[3]) || 10) * 1000;
+const commits = Number(process.argv[3]) || 10;
 
 if (__filename.split("/").reverse()[1] === "master") {
     if (join(process.cwd(), "index.js") !== __filename) {
