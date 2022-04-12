@@ -13,26 +13,28 @@ if (__filename.split("/").reverse()[1] === "master") {
 
     console.log(`Spawning ${threads} slave${threads !== 1 ? "s" : ""}...`);
 
+    let cleaned = false;
+
     const exit = () => {
-        console.log(`Cleaning up... please wait.`);
+        if (!cleaned) {
+            console.log(`Cleaning up... please wait.`);
 
-        for (let i = 0; i < created; i++) execSync(`./merge.sh ${i} || echo \"Unable to merge 'slave-${i}'\"`);
+            for (let i = 0; i < threads; i++) execSync(`./merge.sh ${i} || echo \"Unable to merge 'slave-${i}'\"`);
 
-        execSync(`rm -rf ../slave-*`);
+            execSync(`rm -rf ../slave-*`);
+        }
+
+        cleaned = true;
 
         process.exit();
     };
 
-    process.on("exit", exit);
-
-    let created = 0;
+    process.on("SIGINT", exit).on("exit", exit);
 
     for (let i = 0; i < threads; i++) {
         execSync(`git clone ../master ../slave-${i}`);
 
         const slave = fork(`../slave-${i}/index.js`, [threads, commits, i].map(String), { cwd: join(process.cwd(), "..", `slave-${i}`) });
-
-        created++;
 
         slave.on("exit", () => execSync(`./merge.sh ${i} || echo \"Unable to merge 'slave-${i}'\"`));
     }
