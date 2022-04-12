@@ -5,7 +5,7 @@ const threads = Number(process.argv[2]) || 10;
 const commits = Number(process.argv[3]) || 10;
 
 if (__filename.split("/").reverse()[1] === "master") {
-    if (join(process.cwd(), "index.ts") !== __filename) {
+    if (join(process.cwd(), "index.js") !== __filename) {
         console.log(`You must be inside the master repository.`);
 
         process.exit();
