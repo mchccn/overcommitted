@@ -17,7 +17,7 @@ if (__filename.split("/").reverse()[1] === "master") {
         child_process_1.execSync(`rm -rf ../slave-*`);
         process.exit();
     };
-    process.on("SIGINT", exit).on("SIGTERM", exit).on("SIGQUIT", exit).on("SIGSTOP", exit);
+    process.on("SIGINT", exit).on("SIGTERM", exit).on("SIGQUIT", exit);
     let created = 0;
     for (let i = 0; i < threads; i++) {
         child_process_1.execSync(`git clone ../master ../slave-${i}`);
