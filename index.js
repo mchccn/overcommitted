@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const path_1 = require("path");
 const threads = Number(process.argv[2]) || 10;
-const commits = Number(process.argv[3]) || 10;
+const commits = (Number(process.argv[3]) || 10) * 1000;
 if (__filename.split("/").reverse()[1] === "master") {
     if (path_1.join(process.cwd(), "index.js") !== __filename) {
         console.log(`You must be inside the master repository.`);
