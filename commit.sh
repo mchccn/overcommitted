@@ -1,5 +1,5 @@
 id=$1
-commits=$($2 + 0)
+commits=$(($2 + 0))
 
 for i in $(seq 1 $commits)
 do
