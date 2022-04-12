@@ -23,7 +23,7 @@ if (__filename.split("/").reverse()[1] === "master") {
         process.exit();
     };
 
-    process.on("SIGINT", exit).on("SIGTERM", exit).on("SIGQUIT", exit).on("SIGSTOP", exit);
+    process.on("SIGINT", exit).on("SIGTERM", exit).on("SIGQUIT", exit);
 
     let created = 0;
 
