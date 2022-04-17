@@ -13,3 +13,4 @@ else
     do
         git commit --allow-empty -m "[slave-$id]: $i"
     done
+fi
